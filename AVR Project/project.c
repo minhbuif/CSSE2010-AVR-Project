@@ -3,7 +3,7 @@
  *
  * Authors: Peter Sutton, Luke Kamols, Jarrod Bennett, Cody Burnett,
  *          Bradley Stone, Yufeng Gao
- * Modified by: <YOUR NAME HERE>
+ * Modified by: Vu Hai Minh Bui
  *
  * Main project event loop and entry point.
  */

@@ -1022,30 +1022,30 @@ END GROUP
  .debug_frame   0x00000750       0x24 timer1.o
  .debug_frame   0x00000774       0x24 timer2.o
 
-.debug_str      0x00000000      0xc97
+.debug_str      0x00000000      0xcdd
  *(.debug_str)
  .debug_str     0x00000000      0x255 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.7.374/gcc/dev/atmega324a/avr5/crtatmega324a.o
  .debug_str     0x00000255      0x233 buttons.o
                                 0x274 (size before relaxing)
- .debug_str     0x00000488       0xf7 game.o
-                                0x22c (size before relaxing)
- .debug_str     0x0000057f      0x16d ledmatrix.o
+ .debug_str     0x00000488       0xf6 game.o
+                                0x22b (size before relaxing)
+ .debug_str     0x0000057e      0x16d ledmatrix.o
                                 0x320 (size before relaxing)
- .debug_str     0x000006ec      0x19f project.o
+ .debug_str     0x000006eb      0x1e6 project.o
                                 0x3f6 (size before relaxing)
- .debug_str     0x0000088b       0xe2 serialio.o
+ .debug_str     0x000008d1       0xe2 serialio.o
                                 0x2e4 (size before relaxing)
- .debug_str     0x0000096d       0x18 spi.o
+ .debug_str     0x000009b3       0x18 spi.o
                                 0x19d (size before relaxing)
- .debug_str     0x00000985      0x1e1 startscrn.o
+ .debug_str     0x000009cb      0x1e1 startscrn.o
                                 0x467 (size before relaxing)
- .debug_str     0x00000b66       0xec terminalio.o
+ .debug_str     0x00000bac       0xec terminalio.o
                                 0x3d2 (size before relaxing)
- .debug_str     0x00000c52       0x29 timer0.o
+ .debug_str     0x00000c98       0x29 timer0.o
                                 0x1d8 (size before relaxing)
- .debug_str     0x00000c7b        0xe timer1.o
+ .debug_str     0x00000cc1        0xe timer1.o
                                 0x17c (size before relaxing)
- .debug_str     0x00000c89        0xe timer2.o
+ .debug_str     0x00000ccf        0xe timer2.o
                                 0x17b (size before relaxing)
 
 .debug_loc      0x00000000     0x177e
