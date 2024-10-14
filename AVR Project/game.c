@@ -213,55 +213,112 @@ bool move_player(int8_t delta_row, int8_t delta_col)
 	// +-----------------------------------------------------------------+
 
 	// <YOUR CODE HERE>
-	if (player_row == 0 && delta_row < 0 && board[7][player_col] == WALL) {
-		player_row = player_row;
-		return false;
-	} else if (player_row == 7 && delta_row > 0 && board[0][player_col] == WALL) {
-		player_row = player_row;
-		return false;
-	} else if (player_col == 0 && delta_col < 0 && board[player_row][15] == WALL) {
-		player_col = player_col;
-		return false;
-	} else if (player_col == 15 && delta_col > 0 && board[player_row][0] == WALL) {
-		player_col = player_col;
-		return false;
-	} else if (board[player_row + delta_row][player_col + delta_col] == WALL && player_col != 0 && player_col != 15) {
-		player_row = player_row;
-		player_col = player_col;
-		return false;
-	} else if (player_col == 0 && board[player_row + delta_row][player_col] == WALL) {
-		player_row = player_row;
-		player_col = player_col;
-		return false;
-	} else if (player_col == 15 && board[player_row + delta_row][player_col] == WALL) {
-		player_row = player_row;
-		player_col = player_col;
-		return false;
-	} else {
-		player_visible = true;
-		flash_player();
-		if (player_row == 0 && delta_row < 0) {
-			player_row = player_row + 7;
-		} else if (player_row == 7 && delta_row > 0) {
-			player_row = player_row - 7;
-		} else {player_row += delta_row;}
-			
-		if (player_col == 15 && delta_col > 0) {
-			player_col = player_col - 15;
-		} else if (player_col == 0 && delta_col < 0) {
-			player_col = player_col + 15;
-		} else {player_col += delta_col;}
-			
-		flash_player();
-		return true;
+	int8_t new_player_row = player_row + delta_row;
+	int8_t new_player_col = player_col + delta_col;
+
+	// Handle wrapping around the edges (both positive and negative deltas)
+	if (new_player_row >= MATRIX_NUM_ROWS) {
+		new_player_row = 0;
+		} else if (new_player_row < 0) {
+		new_player_row = MATRIX_NUM_ROWS - 1;
 	}
-	
+
+	if (new_player_col >= MATRIX_NUM_COLUMNS) {
+		new_player_col = 0;
+		} else if (new_player_col < 0) {
+		new_player_col = MATRIX_NUM_COLUMNS - 1;
+	}
+
+	uint8_t target_square = board[new_player_row][new_player_col];
+	int8_t next_square_row = new_player_row + delta_row;
+	int8_t next_square_col = new_player_col + delta_col;
+
+	// Handle wrapping around for the next square behind the box (for negative deltas as well)
+	if (next_square_row >= MATRIX_NUM_ROWS) {
+		next_square_row = 0;
+		} else if (next_square_row < 0) {
+		next_square_row = MATRIX_NUM_ROWS - 1;
+	}
+
+	if (next_square_col >= MATRIX_NUM_COLUMNS) {
+		next_square_col = 0;
+		} else if (next_square_col < 0) {
+		next_square_col = MATRIX_NUM_COLUMNS - 1;
+	}
+
+	uint8_t next_square = board[next_square_row][next_square_col];
+
+	// Check if the player is moving into a wall
+	if (target_square == WALL) {
+		printf_P(PSTR("Cannot move into a wall.\n"));
+		return false;
+	}
+
+	// Check if the player is moving into a box
+	if (target_square == BOX || target_square == (BOX | TARGET)) {
+		// Check if the next square behind the box is a wall or another box
+		if (next_square == WALL) {
+			printf_P(PSTR("Cannot push box onto wall.\n"));
+			return false;
+			} else if (next_square == BOX || next_square == (BOX | TARGET)) {
+			printf_P(PSTR("Cannot stack boxes.\n"));
+			return false;
+			} else if (next_square == TARGET) {
+			// Valid push: move the box and the player
+			board[next_square_row][next_square_col] = BOX | TARGET;
+			} else {
+				board[next_square_row][next_square_col] = BOX;
+			}
+
+			// Update the old box position to ROOM or TARGET
+			if (target_square == (BOX | TARGET)) {
+				board[new_player_row][new_player_col] = TARGET;
+			} else {
+				board[new_player_row][new_player_col] = ROOM;
+			
+
+			printf_P(PSTR("Box moved.\n"));
+
+			// Handle target square color change
+			if (next_square == TARGET) {
+				printf_P(PSTR("Box moved onto target.\n"));
+			}
+
+			// Before moving the player, clear the old player position
+			paint_square(player_row, player_col);
+
+			// Move the player to the original position of the box
+			player_visible = true;
+			flash_player();
+			player_row = new_player_row;
+			player_col = new_player_col;
+
+			// Update display
+			paint_square(player_row, player_col);  // Paint player's new position
+			paint_square(next_square_row, next_square_col);  // Paint the new box position
+			flash_player();  // Update player visibility
+
+			return true;
+		}
+	}
+
+	// Handle normal movement (no boxes involved)
+	// Before moving the player, clear the old player position
+	player_visible = true;
+	flash_player();
+
+
+	board[player_row][player_col] = ROOM;  // Clear the player's current position
+	player_row = new_player_row;
+	player_col = new_player_col;
+	flash_player();  // Update player visibility
+
+	return true;
 }
 
 // This function checks if the game is over (i.e., the level is solved), and
 // returns true iff (if and only if) the game is over.
-bool is_game_over(void)
-{
+bool is_game_over(void) {
 	// <YOUR CODE HERE>.
 	return false;
 }
