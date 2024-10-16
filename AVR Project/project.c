@@ -142,7 +142,9 @@ void new_game(void)
 void play_game(void)
 {
 	uint32_t last_flash_time = get_current_time();
-
+	uint32_t level_start_time = get_current_time();
+	uint32_t last_displayed_time = 0;
+	
 	// We play the game until it's over.
 	while (!is_game_over())
 	{
@@ -227,6 +229,14 @@ void play_game(void)
 
 			// Update the most recent icon flash time.
 			last_flash_time = current_time;
+		}
+		uint32_t elapsed_seconds = (current_time - level_start_time) / 1000;
+		
+		if (elapsed_seconds != last_displayed_time)
+		{
+			move_terminal_cursor(0, 0);
+			printf_P(PSTR("%lu s"), elapsed_seconds); 
+			last_displayed_time = elapsed_seconds;
 		}
 	}
 	// We get here if the game is over.
