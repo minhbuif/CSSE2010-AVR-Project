@@ -2,7 +2,7 @@
  * game.c
  *
  * Authors: Jarrod Bennett, Cody Burnett, Bradley Stone, Yufeng Gao
- * Modified by: <YOUR NAME HERE>
+ * Modified by: Vu Hai Minh Bui
  *
  * Game logic and state handler.
  */ 
@@ -44,28 +44,62 @@ static uint8_t player_col;
 // A flag for keeping track of whether the player is currently visible.
 static bool player_visible;
 
+#define PLAYER_SYMBOL '@'
+#define WALL_SYMBOL '#'
+#define BOX_SYMBOL 'O'
+#define TARGET_SYMBOL 'X'
+#define EMPTY_SYMBOL ' '
+
 
 // ========================== GAME LOGIC FUNCTIONS ===========================
 
 // This function paints a square based on the object(s) currently on it.
+// Update the terminal display to match the LED matrix
+
+const char* wall_messages[] = {
+	"I've hit the wall.",
+	"I've bumped into the wall",
+	"Ouch! A wall"
+};
+
 static void paint_square(uint8_t row, uint8_t col)
 {
 	switch (board[row][col] & OBJECT_MASK)
 	{
 		case ROOM:
 			ledmatrix_update_pixel(row, col, COLOUR_BLACK);
+			move_terminal_cursor(MATRIX_NUM_ROWS - 1 - row + 12, col + 32);
+			
+			set_display_attribute(BG_BLACK);
+			printf(" ");
 			break;
 		case WALL:
 			ledmatrix_update_pixel(row, col, COLOUR_WALL);
+			move_terminal_cursor(MATRIX_NUM_ROWS - 1 - row + 12, col + 32);
+			
+			set_display_attribute(BG_YELLOW);
+			printf(" ");
 			break;
 		case BOX:
 			ledmatrix_update_pixel(row, col, COLOUR_BOX);
+			move_terminal_cursor(MATRIX_NUM_ROWS - 1 - row + 12, col + 32);
+			
+			set_display_attribute(BG_MAGENTA);
+			printf(" ");
 			break;
 		case TARGET:
 			ledmatrix_update_pixel(row, col, COLOUR_TARGET);
+			move_terminal_cursor(MATRIX_NUM_ROWS - 1 - row + 12, col + 32);
+			
+			set_display_attribute(BG_RED);
+			printf(" ");
 			break;
 		case BOX | TARGET:
 			ledmatrix_update_pixel(row, col, COLOUR_DONE);
+			move_terminal_cursor(MATRIX_NUM_ROWS - 1 - row + 12, col + 32);
+			
+			set_display_attribute(BG_GREEN);
+			printf(" ");
 			break;
 		default:
 			break;
@@ -148,11 +182,17 @@ void flash_player(void)
 	{
 		// The player is visible, paint it with COLOUR_PLAYER.
 		ledmatrix_update_pixel(player_row, player_col, COLOUR_PLAYER);
+		move_terminal_cursor(MATRIX_NUM_ROWS - 1 - player_row + 12, player_col + 32);
+		
+		set_display_attribute(BG_CYAN);
+		printf(" ");
 	}
 	else
 	{
 		// The player is not visible, paint the underlying square.
 		paint_square(player_row, player_col);
+		
+		
 	}
 }
 
@@ -250,7 +290,11 @@ bool move_player(int8_t delta_row, int8_t delta_col)
 
 	// Check if the player is moving into a wall
 	if (target_square == WALL) {
-		printf_P(PSTR("Cannot move into a wall.\n"));
+		move_terminal_cursor(5, 32);
+		clear_to_end_of_line();
+		int randomIndex = rand() % 3;
+		printf("%s\n", wall_messages[randomIndex]);
+		
 		return false;
 	}
 
@@ -258,10 +302,8 @@ bool move_player(int8_t delta_row, int8_t delta_col)
 	if (target_square == BOX || target_square == (BOX | TARGET)) {
 		// Check if the next square behind the box is a wall or another box
 		if (next_square == WALL) {
-			printf_P(PSTR("Cannot push box onto wall.\n"));
 			return false;
 			} else if (next_square == BOX || next_square == (BOX | TARGET)) {
-			printf_P(PSTR("Cannot stack boxes.\n"));
 			return false;
 			} else if (next_square == TARGET) {
 			// Valid push: move the box and the player
@@ -277,11 +319,10 @@ bool move_player(int8_t delta_row, int8_t delta_col)
 				board[new_player_row][new_player_col] = ROOM;
 			
 
-			printf_P(PSTR("Box moved.\n"));
+
 
 			// Handle target square color change
 			if (next_square == TARGET) {
-				printf_P(PSTR("Box moved onto target.\n"));
 			}
 
 			// Before moving the player, clear the old player position
@@ -297,7 +338,6 @@ bool move_player(int8_t delta_row, int8_t delta_col)
 			paint_square(player_row, player_col);  // Paint player's new position
 			paint_square(next_square_row, next_square_col);  // Paint the new box position
 			flash_player();  // Update player visibility
-
 			return true;
 		}
 	}
@@ -307,12 +347,9 @@ bool move_player(int8_t delta_row, int8_t delta_col)
 	player_visible = true;
 	flash_player();
 
-
-	board[player_row][player_col] = ROOM;  // Clear the player's current position
 	player_row = new_player_row;
 	player_col = new_player_col;
 	flash_player();  // Update player visibility
-
 	return true;
 }
 
@@ -320,5 +357,22 @@ bool move_player(int8_t delta_row, int8_t delta_col)
 // returns true iff (if and only if) the game is over.
 bool is_game_over(void) {
 	// <YOUR CODE HERE>.
-	return false;
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 16; j++) {
+			if (board[i][j] == TARGET) {
+				return false;
+			}
+		}
+	}
+	return true;
 }
+void hides_player_when_game_over(void) {
+	board[player_row][player_col] = ROOM;
+	paint_square(player_row, player_col);
+}
+
+	
+	
+
+
+

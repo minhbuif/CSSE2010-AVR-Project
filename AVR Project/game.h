@@ -2,7 +2,7 @@
  * game.h
  *
  * Authors: Jarrod Bennett, Cody Burnett, Bradley Stone, Yufeng Gao
- * Modified by: <YOUR NAME HERE>
+ * Modified by: Vu Hai Minh Bui
  *
  * Function prototypes for game functions available externally. You may wish
  * to add extra function prototypes here to make other functions available to
@@ -52,4 +52,6 @@ bool is_game_over(void);
 /// </summary>
 void flash_player(void);
 
+void hides_player_when_game_over(void);
+	
 #endif /* GAME_H_ */

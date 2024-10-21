@@ -31,6 +31,7 @@
 #include "timer2.h"
 
 
+
 // Function prototypes - these are defined below (after main()) in the order
 // given here.
 void initialise_hardware(void);
@@ -38,6 +39,7 @@ void start_screen(void);
 void new_game(void);
 void play_game(void);
 void handle_game_over(void);
+
 
 /////////////////////////////// main //////////////////////////////////
 int main(void)
@@ -47,7 +49,7 @@ int main(void)
 
 	// Show the start screen. Returns when the player starts the game.
 	start_screen();
-
+	
 	// Loop forever and continuously play the game.
 	while (1)
 	{
@@ -69,6 +71,9 @@ void initialise_hardware(void)
 	// Turn on global interrupts.
 	sei();
 }
+
+
+
 
 void start_screen(void)
 {
@@ -145,6 +150,8 @@ void play_game(void)
 	uint32_t level_start_time = get_current_time();
 	uint32_t last_displayed_time = 0;
 	
+
+	
 	// We play the game until it's over.
 	while (!is_game_over())
 	{
@@ -153,7 +160,6 @@ void play_game(void)
 		// 0 has been pushed, we get BUTTON0_PUSHED, and likewise, if
 		// button 1 has been pushed, we get BUTTON1_PUSHED, and so on.
 		ButtonState btn = button_pushed();
-
 		if (btn == BUTTON0_PUSHED)
 		{
 			// Move the player, see move_player(...) in game.c.
@@ -219,7 +225,9 @@ void play_game(void)
 				else {;}
 				}
 		}
+		
 
+		
 		uint32_t current_time = get_current_time();
 		if (current_time >= last_flash_time + 200)
 		{
@@ -234,12 +242,16 @@ void play_game(void)
 		
 		if (elapsed_seconds != last_displayed_time)
 		{
-			move_terminal_cursor(0, 0);
-			printf_P(PSTR("%lu s"), elapsed_seconds); 
+			move_terminal_cursor(8, 32);
+			printf_P(PSTR("Elapsed time: %lu s"), elapsed_seconds);
 			last_displayed_time = elapsed_seconds;
 		}
+		
 	}
 	// We get here if the game is over.
+	hides_player_when_game_over();
+	
+	
 }
 
 void handle_game_over(void)
@@ -264,8 +276,15 @@ void handle_game_over(void)
 		if (toupper(serial_input) == 'R')
 		{
 			// <YOUR CODE HERE>
+			new_game();
+			play_game();
+			handle_game_over();
 		}
 		// Now check for other possible inputs.
+		if (toupper(serial_input) == 'E')
+		{
+			main();
+		}
 		
 	}
 }

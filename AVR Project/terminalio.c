@@ -107,3 +107,4 @@ void draw_vertical_line(int col, int start_row, int end_row)
 	// Reset the mode to normal.
 	normal_display_mode();
 }
+
