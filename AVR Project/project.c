@@ -31,7 +31,7 @@
 #include "timer2.h"
 
 
-
+static bool is_paused = false;
 // Function prototypes - these are defined below (after main()) in the order
 // given here.
 void initialise_hardware(void);
@@ -73,7 +73,20 @@ void initialise_hardware(void)
 }
 
 
+void new_game2(void)
+{
+	// Clear the serial terminal.
+	hide_cursor();
+	clear_terminal();
 
+	// Initialise the game and display.
+	initialise_game2();
+
+	// Clear all button presses and serial inputs, so that potentially
+	// buffered inputs aren't going to make it to the new game.
+	clear_button_presses();
+	clear_serial_input_buffer();
+}
 
 void start_screen(void)
 {
@@ -120,6 +133,11 @@ void start_screen(void)
 			{
 				break;
 			}
+			if (serial_input == '2') {
+				new_game2();
+				play_game();
+				handle_game_over();
+			}
 		}
 
 		// No button presses and no 's'/'S' typed into the terminal,
@@ -144,16 +162,27 @@ void new_game(void)
 	clear_serial_input_buffer();
 }
 
+
+
 void play_game(void)
 {
 	uint32_t last_flash_time = get_current_time();
 	uint32_t level_start_time = get_current_time();
 	uint32_t last_displayed_time = 0;
 	
+	if (serial_input_available())
+		{
 
+			int serial_input = fgetc(stdin);
+
+			if (serial_input == 'p' || serial_input == 'P')
+			{
+				is_paused = !is_paused;
+			}
+		}
 	
 	// We play the game until it's over.
-	while (!is_game_over())
+	while (!is_game_over() && !is_paused)
 	{
 		// We need to check if any buttons have been pushed, this will
 		// be NO_BUTTON_PUSHED if no button has been pushed. If button
@@ -256,6 +285,11 @@ void play_game(void)
 
 void handle_game_over(void)
 {
+	for (int i = 12; i < 33; i++)
+	{
+		move_terminal_cursor(i, 32);
+		clear_to_end_of_line();
+	}
 	move_terminal_cursor(14, 10);
 	printf_P(PSTR("GAME OVER"));
 	move_terminal_cursor(15, 10);
@@ -284,6 +318,12 @@ void handle_game_over(void)
 		if (toupper(serial_input) == 'E')
 		{
 			main();
+		}
+		if (toupper(serial_input) == 'N')
+		{
+			new_game2();
+			play_game();
+			handle_game_over();
 		}
 		
 	}

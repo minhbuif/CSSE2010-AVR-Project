@@ -34,6 +34,8 @@
 /// </summary>
 void initialise_game(void);
 
+void initialise_game2(void);
+
 /// <summary>
 /// Moves the player based on row and column deltas.
 /// </summary>

@@ -170,6 +170,68 @@ void initialise_game(void)
 	}
 }
 
+void initialise_game2(void)
+{
+	// Short definitions of game objects used temporarily for constructing
+	// an easier-to-visualise game layout.
+	#define _	(ROOM)
+	#define W	(WALL)
+	#define T	(TARGET)
+	#define B	(BOX)
+
+	// The starting layout of level 1. In this array, the top row is the
+	// 0th row, and the bottom row is the 7th row. This makes it visually
+	// identical to how the pixels are oriented on the LED matrix, however
+	// the LED matrix treats row 0 as the bottom row and row 7 as the top
+	// row.
+	static const uint8_t lv2_layout[MATRIX_NUM_ROWS][MATRIX_NUM_COLUMNS] =
+	{
+		{ _, _, W, W, W, W, _, _, W, W, _, _, _, _, _, W },
+		{ _, _, W, _, _, W, _, W, W, _, _, _, _, B, _, _ },
+		{ _, _, W, _, B, W, W, W, _, _, T, W, _, T, W, W },
+		{ _, _, W, _, _, _, _, T, _, _, B, W, W, W, _, _ },
+		{ W, W, W, W, _, W, _, _, _, _, _, W, _, W, W, _ },
+		{ W, T, B, _, _, _, _, B, _, _, _, W, W, _, W, W },
+		{ W, _, _, _, T, _, _, _, _, _, _, B, T, _, _, _ },
+		{ W, W, W, W, W, W, W, W, W, W, W, W, W, W, W, W }
+	};
+
+	// Undefine the short game object names defined above, so that you
+	// cannot use use them in your own code. Use of single-letter names/
+	// constants is never a good idea.
+	#undef _
+	#undef W
+	#undef T
+	#undef B
+
+	// Set the initial player location (for level 2).
+	player_row = 6;
+	player_col = 15;
+
+	// Make the player icon initially invisible.
+	player_visible = false;
+
+	// Copy the starting layout (level 1 map) to the board array, and flip
+	// all the rows.
+	for (uint8_t row = 0; row < MATRIX_NUM_ROWS; row++)
+	{
+		for (uint8_t col = 0; col < MATRIX_NUM_COLUMNS; col++)
+		{
+			board[MATRIX_NUM_ROWS - 1 - row][col] =
+				lv2_layout[row][col];
+		}
+	}
+
+	// Draw the game board (map).
+	for (uint8_t row = 0; row < MATRIX_NUM_ROWS; row++)
+	{
+		for (uint8_t col = 0; col < MATRIX_NUM_COLUMNS; col++)
+		{
+			paint_square(row, col);
+		}
+	}
+}
+
 // This function flashes the player icon. If the icon is currently visible, it
 // is set to not visible and removed from the display. If the player icon is
 // currently not visible, it is set to visible and rendered on the display.
