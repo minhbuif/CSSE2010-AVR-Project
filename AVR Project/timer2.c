@@ -15,9 +15,9 @@ void init_timer2(void)
 {
 	// Setup timer 2.
 	TCNT2 = 0;
+	DDRC = 0xFF;
 	DDRA = 0xFF;
-	DDRC = 0x01;
-	increment_step_count();
+
 	
 }
 void increment_step_count(void) {
